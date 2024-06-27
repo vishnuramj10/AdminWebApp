@@ -1,0 +1,637 @@
+{% extends "basestructure.html" %}
+{% block content %}
+<html lang="en">
+    <style>
+        /* Custom CSS for the form */
+        .hidden {
+            display: none;
+        }
+ 
+        body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        position: relative;
+        height: 100vh;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .logo-img {
+        position: absolute;
+        top: 0px; /* Adjust vertical position as needed */
+        left: 0; /* Adjust horizontal position as needed */
+        width: 70px; /* Adjust width of the image */
+        height: auto; /* Maintain aspect ratio */
+        z-index: 1; /* Ensure image is above the red strip */
+    }
+    .logo-img-2 {
+        position: absolute;
+        top: 0px; /* Adjust vertical position as needed */
+        right: 0; /* Adjust horizontal position as needed */
+        width: 70px; /* Adjust width of the image */
+        height: auto; /* Maintain aspect ratio */
+        z-index: 1; /* Ensure image is above the red strip */
+    }
+
+
+    body::before,
+    body::after {
+        display: flex;
+        justify-content: flex-start;
+        content: '';
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 70px;
+        height: 100vh;
+        background-color: red;
+    }
+
+    body::before {
+        left: 0; 
+        
+
+    }
+
+    body::after {
+        right: 0;
+
+    }    
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Travel Pre-Authorization Form</title>
+    {% load static %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <img src="{% static 'logo2.png' %}" class="logo-img" alt="Logo">
+    <img src="{% static 'logo2.png' %}" class="logo-img-2" alt="Logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="travel-tab" data-bs-toggle="tab" data-bs-target="#travel" type="button" role="tab" aria-controls="travel" aria-selected="true">Travel Form</button>
+                        </li>
+                        {% if is_supervisor %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="supervisor-tab" data-bs-toggle="tab" data-bs-target="#supervisor" type="button" role="tab" aria-controls="supervisor" aria-selected="false">Approvals</button>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <!-- Logout Button aligned to the top right corner -->
+                <form action="{% url 'travelrequestapp:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tab-content">
+
+                <div class="tab-pane fade show active" id="travel" role="tabpanel" aria-labelledby="travel-tab">
+                    <div class="form-container">
+                     <h1 style="background-color: #f3ffff; color: rgb(237, 17, 17); padding: 10px;">Travel Authorization Form</h1>
+                    <br>
+                    <p>**Must be approved prior to travel**</p>
+                    <br>
+                    <p>Form should be submitted four weeks prior to planned travel</p>
+                    <br>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ form.today_date.label_tag }}
+                                {{ form.today_date }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.signature.label_tag }}(Enter Full Name)
+                                {{ form.signature }}
+                            </div>
+                        </div>
+                        <h3 style="background-color: #1abc9c; color: white; padding: 10px;">Travel Dates</h3>
+                        <br>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{ form.date_of_travel_from_date.label_tag }}
+                                {{ form.date_of_travel_from_date }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.date_of_travel_to_date.label_tag }}
+                                {{ form.date_of_travel_to_date }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{ form.conference_name.label_tag }}
+                                {{ form.conference_name}}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.conference_location.label_tag }}
+                                {{ form.conference_location }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ form.reason_for_travel.label_tag }}
+                                {{ form.reason_for_travel }}
+                            </div>
+                        </div>
+                        <h3 style="background-color: #1abc9c; color: white; padding: 10px;">Cost per Person</h3>
+                        <br>
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ form.people_travelling.label_tag }}
+                                {{ form.people_travelling }}
+                            </div>
+                            {% if formset %}
+                            {{ formset.management_form }}
+                            <div id='person-form-list'>
+                                {% for form in formset %}
+                                <div class='person-form'>
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            {{ form.name.label_tag }}
+                                            {{ form.name }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.phone_number.label_tag }}
+                                            {{ form.phone_number }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form.email.label_tag }}
+                                            {{ form.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div id='empty-form' class='hidden'>{{ formset.empty_form }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{ form.hotel_cost.label_tag }}
+                                {{ form.hotel_cost }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.conference_registration_cost.label_tag }}
+                                {{ form.conference_registration_cost }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{ form.airfare_train_cost.label_tag }}
+                                {{ form.airfare_train_cost }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.car_rental_cost.label_tag }}
+                                {{ form.car_rental_cost }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ form.other_misc_costs.label_tag }}
+                                {{ form.other_misc_costs }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.total_estimated_costs.label_tag }}
+                                {{ form.total_estimated_costs }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ form.comments.label_tag }}
+                                {{ form.comments }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            {% if not is_supervisor %}
+                            <div class="col-md-6">
+                                {{ form.supervisor.label_tag }}
+                                    {{ form.supervisor }}
+                                </div>
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ form.associate_director.label_tag }}
+                                {{ form.associate_director }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Submit</button>
+                    </form>
+                </div>
+                </div>
+                {% if is_supervisor %}
+                <div class="tab-pane fade" id="supervisor" role="tabpanel" aria-labelledby="supervisor-tab">
+                    <br><br>
+                    <div class="form-container">
+                        <h3>Forms to Approve</h3>
+                        <div id="accordion">
+                            {% for form in supervisor_forms %}
+                            <div class="card mb-4" id="formContainer{{ form.id }}">
+                                <div class="card-header" id="heading{{ form.id }}">
+                                    <div class="d-flex justify-content-between align-items-left">
+                                        <div>
+                                            <strong>Date:</strong> {{ form.today_date }} | <strong>Submitted By:</strong> {{form.submitted_by_name}}
+                                        </div>
+                                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapse{{ form.id }}" aria-expanded="true" aria-controls="collapse{{ form.id }}">
+                                            <i class="fas fa-chevron-down"></i> <!-- Font Awesome chevron down icon -->
+                                        </button>
+                                    </div>
+                                </div>
+                                <form id="form{{ form.id }}" action="{% url 'travelrequestapp:approval_request' %}" method="POST" target="iframe{{ form.id }}" onsubmit="return submitForm(event, '{{ form.id }}', event.submitter.value);">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_id" value="{{ form.id }}">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                                </form>
+                                <iframe id="iframe{{ form.id }}" name="iframe{{ form.id }}" style="display: none;"></iframe>
+                                <div id="collapse{{ form.id }}" class="collapse" aria-labelledby="heading{{ form.id }}" data-bs-parent="#accordion">
+                                    <div class="card-body">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>From Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_from_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>To Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_to_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Name:</strong></td>
+                                                    <td>{{ form.conference_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Location:</strong></td>
+                                                    <td>{{ form.conference_location }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Reason for Travel:</strong></td>
+                                                    <td>{{ form.reason_for_travel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>People Travelling:</strong></td>
+                                                    <td>{{ form.people_travelling }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapsePersons{{ form.id }}" role="button" aria-expanded="false" aria-controls="collapsePersons{{ form.id }}">
+                                                            View People Travelling
+                                                        </a>
+                                                        <div class="collapse mt-3" id="collapsePersons{{ form.id }}">
+                                                            <div class="card card-body">
+                                                                <ul>
+                                                                {% for person in form.related_persons %}
+                                                                    <li>{{ person.name }} - {{ person.email }} - {{ person.phone_number }}</li>
+                                                                {% endfor %}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                               
+                                                <tr>
+                                                    <td><strong>Hotel Cost:</strong></td>
+                                                    <td>{{ form.hotel_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Registration Cost:</strong></td>
+                                                    <td>{{ form.conference_registration_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Airfare/Train Cost:</strong></td>
+                                                    <td>{{ form.airfare_train_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Car Rental Cost:</strong></td>
+                                                    <td>{{ form.car_rental_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Other Costs:</strong></td>
+                                                    <td>{{ form.other_misc_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Total Estimated Costs:</strong></td>
+                                                    <td>{{ form.total_estimated_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Comments:</strong></td>
+                                                    <td>{{ form.comments }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <h3>Approved Forms</h3>
+                        <div id="accordion">
+                            {% for form in approved_forms %}
+                            <div class="card mb-4 approved-form" id="formContainer{{ form.id }}">
+                                <div class="card-header" id="heading{{ form.id }}">
+                                    <div class="d-flex justify-content-between align-items-left">
+                                        <div>
+                                            <strong>Date:</strong> {{ form.today_date }} | <strong>Submitted By:</strong> {{form.submitted_by_name}}
+                                        </div>
+                                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapse{{ form.id }}" aria-expanded="true" aria-controls="collapse{{ form.id }}">
+                                            <i class="fas fa-chevron-down"></i> <!-- Font Awesome chevron down icon -->
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="collapse{{ form.id }}" class="collapse" aria-labelledby="heading{{ form.id }}" data-bs-parent="#accordion">
+                                    <div class="card-body">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>From Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_from_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>To Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_to_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Name:</strong></td>
+                                                    <td>{{ form.conference_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Location:</strong></td>
+                                                    <td>{{ form.conference_location }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Reason for Travel:</strong></td>
+                                                    <td>{{ form.reason_for_travel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>People Travelling:</strong></td>
+                                                    <td>{{ form.people_travelling }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapsePersons{{ form.id }}" role="button" aria-expanded="false" aria-controls="collapsePersons{{ form.id }}">
+                                                            View People Travelling
+                                                        </a>
+                                                        <div class="collapse mt-3" id="collapsePersons{{ form.id }}">
+                                                            <div class="card card-body">
+                                                                <ul>
+                                                                {% for person in form.related_persons %}
+                                                                    <li>{{ person.name }} - {{ person.email }} - {{ person.phone_number }}</li>
+                                                                {% endfor %}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Hotel Cost:</strong></td>
+                                                    <td>{{ form.hotel_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Registration Cost:</strong></td>
+                                                    <td>{{ form.conference_registration_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Airfare/Train Cost:</strong></td>
+                                                    <td>{{ form.airfare_train_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Car Rental Cost:</strong></td>
+                                                    <td>{{ form.car_rental_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Other Costs:</strong></td>
+                                                    <td>{{ form.other_misc_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Total Estimated Costs:</strong></td>
+                                                    <td>{{ form.total_estimated_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Comments:</strong></td>
+                                                    <td>{{ form.comments }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <h3>Rejected Forms</h3>
+                        <div id="accordion">
+                            {% for form in rejected_forms %}
+                            <div class="card mb-4 rejected-form" id="formContainer{{ form.id }}">
+                                <div class="card-header" id="heading{{ form.id }}">
+                                    <div class="d-flex justify-content-between align-items-left">
+                                        <div>
+                                            <strong>Date:</strong> {{ form.today_date }} | <strong>Submitted By:</strong> {{form.submitted_by_name}}
+                                            
+                                        </div>
+                                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapse{{ form.id }}" aria-expanded="true" aria-controls="collapse{{ form.id }}">
+                                            <i class="fas fa-chevron-down"></i> <!-- Font Awesome chevron down icon -->
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="collapse{{ form.id }}" class="collapse" aria-labelledby="heading{{ form.id }}" data-bs-parent="#accordion">
+                                    <div class="card-body">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>From Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_from_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>To Date:</strong></td>
+                                                    <td>{{ form.date_of_travel_to_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Name:</strong></td>
+                                                    <td>{{ form.conference_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Location:</strong></td>
+                                                    <td>{{ form.conference_location }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Reason for Travel:</strong></td>
+                                                    <td>{{ form.reason_for_travel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>People Travelling:</strong></td>
+                                                    <td>{{ form.people_travelling }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Hotel Cost:</strong></td>
+                                                    <td>{{ form.hotel_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Conference Registration Cost:</strong></td>
+                                                    <td>{{ form.conference_registration_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Airfare/Train Cost:</strong></td>
+                                                    <td>{{ form.airfare_train_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Car Rental Cost:</strong></td>
+                                                    <td>{{ form.car_rental_cost }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Other Costs:</strong></td>
+                                                    <td>{{ form.other_misc_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Total Estimated Costs:</strong></td>
+                                                    <td>{{ form.total_estimated_costs }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Comments:</strong></td>
+                                                    <td>{{ form.comments }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+ </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        
+        const addMorePeople = document.getElementById('people-travelling');
+        const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
+        const formCopyTarget = document.getElementById('person-form-list');
+        formCopyTarget.innerHTML = '';
+        addMorePeople.addEventListener('input', add_new_form);
+        function add_new_form(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            const currentValue = parseInt(event.target.value);
+            if (currentValue > parseInt(event.target.min)) {
+                addForm(currentValue);
+            } else {
+                removeForm();
+            }
+
+            function addForm(count) {
+                const formCopyTarget = document.getElementById('person-form-list');
+                const emptyFormEl = document.getElementById('empty-form').cloneNode(true);
+                emptyFormEl.setAttribute('class', 'person-form')
+                emptyFormEl.removeAttribute('id');
+                formCopyTarget.append(emptyFormEl)
+                const currentPersonForms = document.getElementsByClassName('person-form');
+                const currentFormCount = currentPersonForms.length + 1;
+                console.log(currentFormCount);
+                const regex = new RegExp('__prefix__', 'g');
+                formCopyTarget.innerHTML = '';
+                const noForms = 1
+                // Create and append the correct number of forms
+                for (let i = 0; i < count; i++) {
+                    const newForm = emptyFormEl.cloneNode(true);
+                    newForm.setAttribute('class', 'person-form');
+                    newForm.setAttribute('id', `form-${noForms + i}`);
+                    newForm.innerHTML = newForm.innerHTML.replace(regex, noForms + i);
+                    formCopyTarget.appendChild(newForm);
+                }
+
+                // Update the TOTAL_FORMS value to reflect the new number of forms
+                totalNewForms.setAttribute('value', count);
+            }
+
+            function removeForm() {
+                const formCopyTarget = document.getElementById('person-form-list');
+                formCopyTarget.innerHTML = ''; 
+            }
+
+        }
+
+        // To calculate the costs
+        const costFields = ['hotel-cost', 'conference-reg-cost', 'airfare-train-cost', 'car-rental-cost', 'other-costs'];  
+        costFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', calculateTotal);
+            }
+        });
+        addMorePeople.addEventListener('input', calculateTotal)
+        function calculateTotal(event) {
+            const costs = costFields.map(fieldId => {
+                return parseFloat(document.getElementById(fieldId).value) || 0;
+            });
+            const people = parseFloat(document.getElementById('people-travelling').value) || 0;
+            let total = 0;
+            costs.forEach(cost => {
+                total += cost;
+            });
+            total *= people+1;
+
+            document.getElementById('total-costs').value = total.toFixed(2);
+        }
+
+        // Modify the submitForm function to disable form fields and display "Approved" upon clicking the "Approve" button
+        function submitForm(event, formId, action) {
+            event.preventDefault(); // Prevent form submission
+            console.log(action)
+            document.getElementById(`form${formId}`).submit();
+            // Disable the "Approve" and "Reject" buttons
+            const approveButton = document.querySelector(`#formContainer${formId} button[value="approve"]`);
+            const rejectButton = document.querySelector(`#formContainer${formId} button[value="reject"]`);
+            approveButton.disabled = true;
+            rejectButton.disabled = true;
+
+            // Display status message and change background color based on action
+            const statusMessage = document.createElement('div');
+            const formContainer = document.getElementById(`formContainer${formId}`);
+            if (action === 'approve') {
+                statusMessage.style.color = 'green';
+                formContainer.style.backgroundColor = '#eafce1'; // Light green color
+            } else if (action === 'reject') {
+                statusMessage.style.color = 'red';
+                formContainer.style.backgroundColor = '#f8d7da'; // Light red color
+            }
+            formContainer.appendChild(statusMessage);
+            const hiddenActionInput = document.createElement('input');
+            hiddenActionInput.type = 'hidden';
+            hiddenActionInput.name = 'action';
+            hiddenActionInput.value = action;
+            document.getElementById(`form${formId}`).appendChild(hiddenActionInput);
+
+            // Submit the form asynchronously via iframe
+            document.getElementById(`iframe${formId}`).src = ''; // Clear previous iframe content
+            document.getElementById(`form${formId}`).target = `iframe${formId}`; // Set form target to iframe
+            document.getElementById(`form${formId}`).submit();
+        }
+        
+
+    </script>
+</body>
+</html>
+{% endblock content %}

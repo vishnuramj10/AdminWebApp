@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Travel Pre-Authorization Forms</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
+ {% load static %}
+ <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  {% block content %}{% endblock content %}
+</body>
+<script type="text/javascript">
+
+  var browserZoomLevel = Math.round(window.devicePixelRatio * 100);
+  // if zoom level is greater than 75
+  if (browserZoomLevel>75){
+      // find how much
+      zoom_level = 100-(browserZoomLevel-75)
+      // add percentage symbol with value
+      zoom_percent = zoom_level+"%"
+      // adjust the browser zoom level
+      document.body.style.zoom = zoom_percent
+    }
+
+</script>
+</html>

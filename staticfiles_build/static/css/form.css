@@ -1,0 +1,136 @@
+.form-control {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-container {
+    width: 100%; /* Adjusted to 100% */
+    max-width: 800px; /* Adjust the max-width as needed */
+    margin: 0 auto;
+}
+
+.hidden{
+    display: none;
+}
+
+
+/* Ensure form fields are displayed as block elements */
+.form-control[type="checkbox"] {
+    width: auto;
+}
+
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allow form rows to wrap on smaller screens */
+    margin-bottom: 15px;
+}
+
+.form-group {
+    width: 100%; /* Adjust as needed */
+    margin-right: 10px; /* Add some space between form groups */
+}
+
+.form-group label {
+    display: block;
+}
+
+/* Style the textarea */
+.form-control textarea {
+    height: 100px;
+    width: 100%;
+}
+
+
+/* Change the submit button color on hover */
+input[type="submit"]:hover {
+    background-color: #c5424d;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-container {
+    width: 100%; /* Adjusted to 100% */
+    max-width: 800px; /* Adjust the max-width as needed */
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap; /* Allow form rows to wrap on smaller screens */
+    margin-bottom: 15px;
+}
+
+.form-group {
+    width: 100%; /* Adjust as needed */
+    margin-right: 10px; /* Add some space between form groups */
+}
+
+.form-group label {
+    display: block;
+}
+
+/* Style the textarea */
+.form-control textarea {
+    height: 100px;
+    width: 100%;
+}
+
+.red-bar {
+    background-color: red; /* Set background color to red */
+    height: 50px; /* Set height of the red bar */
+    width: 100%; /* Set width to 100% to cover the entire page */
+    position: fixed; /* Fixed position so it stays at the top */
+    top: 0; /* Position at the top of the page */
+    z-index: 1000; /* Set a high z-index to ensure it's above other elements */
+}
+
+.btn-submit {
+    border-radius: 5px;
+    background: #ca253b;
+    color: #FFF;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    padding: 12px 68px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    margin-top: 30px;
+    line-height: 26px;
+}
+
+.btn-submit:hover {
+    background-color: #fff;
+    color: #e8103b;
+}
+
+.container-with-strip {
+    display: flex;
+    align-items: flex-start;
+}
+.red-vertical-strip {
+    width: 10px;
+    background-color: red;
+}
+.form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.big-select {
+    font-size: 1.5rem;
+    padding: 10px;
+}
+

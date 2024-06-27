@@ -1,0 +1,21 @@
+{% extends "basestructure.html" %}
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<div class="shadow-wrap">
+ <div class="form-wrap">
+    {% load static %}
+<div class="logo-container">
+    <img src="{% static 'logo.png' %}" alt="Logo" class="logo-img">
+</div>
+<h1 class="title">Cornwall Center</h1> 
+    <h2 class="title">Newark</h1>
+<h3> Login </h3>
+<form method="POST">
+ {% csrf_token %}
+ {{form}}
+ <button type="submit">Submit</button>
+</form>
+<a class="signup-link" href="{% url "travelrequestapp:authView" %}">Signup</a>
+</div>
+</div>
+{% endblock content %}a
