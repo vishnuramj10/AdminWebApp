@@ -36,7 +36,8 @@ def home(request):
              #         [f'{supervisor_email}'])
             if form.cleaned_data.get('people_travelling') > 0:
                 if formset.is_valid():
-                    prefix = 1
+                    print(formset)
+                    prefix = 0
                     for form in formset:
                         person = form.save(commit=False)
                         person.name = request.POST.get(f'form-{str(prefix)}-name')

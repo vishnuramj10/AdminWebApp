@@ -3,6 +3,17 @@
 <head>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+  .errorlist {
+    color: red;
+    font-weight: bold;
+    font-size: 16px; /* Adjust the font size as needed */
+}
+.errorlist li {
+    list-style-type: none; /* Remove list bullets */
+}
+
+</style>
 <body">
   <div class="shadow-wrap-signup">
   <div class="form-wrap-signup">
@@ -14,6 +25,15 @@
         <h2 class="title">Newark</h1> 
     <form method="POST">
     {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="errorlist">
+      <ul>
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
     <a class="signup-link" href="{% url "travelrequestapp:login" %}"> Login </a>

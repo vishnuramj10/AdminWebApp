@@ -174,4 +174,13 @@ class TravelPreAuthorizationModelForm(forms.ModelForm):
         self.fields['supervisor'].choices = [
             (supervisor.id, supervisor.name) for supervisor in Supervisor.objects.filter(supervisor=True)
         ]
+    def clean(self):
+        cleaned_data = super().clean()
+        from_date = cleaned_data.get("date_of_travel_from_date")
+        to_date = cleaned_data.get("date_of_travel_to_date")
+
+        if from_date and to_date and from_date >= to_date:
+            raise forms.ValidationError('You cannot have To Date before From Date')
+
+        return cleaned_data
         

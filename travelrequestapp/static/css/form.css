@@ -7,9 +7,6 @@
     box-sizing: border-box;
 }
 
-.form-container {
-    background-color: #eeb4b4; /* Light red background color */
-}
 
 .hidden{
     display: none;

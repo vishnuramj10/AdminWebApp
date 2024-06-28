@@ -17,6 +17,16 @@
         margin: 0;
         box-sizing: border-box;
     }
+    .errorlist {
+            color: rgb(152, 65, 65);
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 25px; /* Change the font size for error messages */
+
+        }
+    .errorlist li {
+        list-style-type: none; /* Remove list bullets */
+    }
 
     .logo-img {
         position: absolute;
@@ -105,14 +115,28 @@
 
                 <div class="tab-pane fade show active" id="travel" role="tabpanel" aria-labelledby="travel-tab">
                     <div class="form-container">
-                     <h1 style="background-color: #f3ffff; color: rgb(237, 17, 17); padding: 10px;">Travel Authorization Form</h1>
+                     <h1 style="color: rgb(35, 33, 33); padding: 10px;">Travel Authorization Form</h1>
                     <br>
-                    <p>**Must be approved prior to travel**</p>
+                    <p>1/ Must be Approved Prior to Travel.</p>
                     <br>
-                    <p>Form should be submitted four weeks prior to planned travel</p>
+                    <p>2/ Form should be Submitted 4 weeks Prior to Planned Travel.</p>
                     <br>
                     <form method="POST">
                         {% csrf_token %}
+                        {% if form.errors %}
+                        <div class="errorlist">
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         <div class="form-row">
                             <div class="form-group">
                                 {{ form.today_date.label_tag }}
@@ -526,52 +550,59 @@
     <script>
         
         const addMorePeople = document.getElementById('people-travelling');
-        const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
-        const formCopyTarget = document.getElementById('person-form-list');
-        formCopyTarget.innerHTML = '';
-        addMorePeople.addEventListener('input', add_new_form);
-        function add_new_form(event) {
-            if (event) {
-                event.preventDefault();
-            }
-            const currentValue = parseInt(event.target.value);
-            if (currentValue > parseInt(event.target.min)) {
-                addForm(currentValue);
-            } else {
-                removeForm();
-            }
+const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
+const formCopyTarget = document.getElementById('person-form-list');
+addMorePeople.addEventListener('input', add_new_form);
+formCopyTarget.innerHTML = '';
 
-            function addForm(count) {
-                const formCopyTarget = document.getElementById('person-form-list');
-                const emptyFormEl = document.getElementById('empty-form').cloneNode(true);
-                emptyFormEl.setAttribute('class', 'person-form')
-                emptyFormEl.removeAttribute('id');
-                formCopyTarget.append(emptyFormEl)
-                const currentPersonForms = document.getElementsByClassName('person-form');
-                const currentFormCount = currentPersonForms.length + 1;
-                console.log(currentFormCount);
-                const regex = new RegExp('__prefix__', 'g');
-                formCopyTarget.innerHTML = '';
-                const noForms = 1
-                // Create and append the correct number of forms
-                for (let i = 0; i < count; i++) {
-                    const newForm = emptyFormEl.cloneNode(true);
-                    newForm.setAttribute('class', 'person-form');
-                    newForm.setAttribute('id', `form-${noForms + i}`);
-                    newForm.innerHTML = newForm.innerHTML.replace(regex, noForms + i);
-                    formCopyTarget.appendChild(newForm);
-                }
-
-                // Update the TOTAL_FORMS value to reflect the new number of forms
-                totalNewForms.setAttribute('value', count);
-            }
-
-            function removeForm() {
-                const formCopyTarget = document.getElementById('person-form-list');
-                formCopyTarget.innerHTML = ''; 
-            }
-
+function add_new_form(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    const currentValue = parseInt(event.target.value);
+    const currentFormsCount = formCopyTarget.getElementsByClassName('person-form').length;
+    
+    if (currentValue > parseInt(event.target.min)) {
+        if (currentValue > currentFormsCount) {
+            addForm(currentValue, currentFormsCount);
+        } else if (currentValue < currentFormsCount) {
+            removeForm(currentValue, currentFormsCount);
         }
+    } else {
+        removeForm(0, currentFormsCount);
+    }
+
+    function addForm(newCount, currentCount) {
+        const emptyFormEl = document.getElementById('empty-form').cloneNode(true);
+        emptyFormEl.setAttribute('class', 'person-form');
+        emptyFormEl.removeAttribute('id');
+        const regex = new RegExp('__prefix__', 'g');
+        
+        for (let i = currentCount; i < newCount; i++) {
+            const newForm = emptyFormEl.cloneNode(true);
+            newForm.setAttribute('class', 'person-form');
+            newForm.setAttribute('id', `form-${i}`);
+            newForm.innerHTML = newForm.innerHTML.replace(regex, i);
+            formCopyTarget.appendChild(newForm);
+        }
+
+        // Update the TOTAL_FORMS value to reflect the new number of forms
+        totalNewForms.setAttribute('value', newCount);
+    }
+
+        function removeForm(newCount, currentCount) {
+            for (let i = currentCount - 1; i >= newCount; i--) {
+                const formToRemove = document.getElementById(`form-${i}`);
+                if (formToRemove) {
+                    formToRemove.remove();
+                }
+            }
+
+            // Update the TOTAL_FORMS value to reflect the new number of forms
+            totalNewForms.setAttribute('value', newCount);
+        }
+    }
+
 
         // To calculate the costs
         const costFields = ['hotel-cost', 'conference-reg-cost', 'airfare-train-cost', 'car-rental-cost', 'other-costs'];  
