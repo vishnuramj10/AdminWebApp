@@ -158,7 +158,8 @@ class TravelPreAuthorizationModelForm(forms.ModelForm):
     #supervisor_choices = [(supervisor.id, supervisor.name) for supervisor in Supervisor.objects.filter(supervisor=True)]
     supervisor = forms.ChoiceField(
         label="Supervisor",
-        widget=forms.Select(attrs={'class': 'form-control big-select'}) # You will populate choices dynamically
+        widget=forms.Select(attrs={'class': 'form-control big-select'}),
+        required=False # You will populate choices dynamically
     )
     associate_director = forms.ChoiceField(
         label="Associate Director",
@@ -168,7 +169,7 @@ class TravelPreAuthorizationModelForm(forms.ModelForm):
     )
     class Meta:
         model = TravelAuthForm
-        exclude = ['submitted_by', 'final_approval_status']
+        exclude = ['submitted_by', 'final_approval_status','supervisor']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['supervisor'].choices = [

@@ -5,12 +5,14 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+
 }
 
 
 .hidden{
     display: none;
 }
+
 
 
 /* Ensure form fields are displayed as block elements */

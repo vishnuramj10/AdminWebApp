@@ -6,12 +6,14 @@
         .hidden {
             display: none;
         }
+        
  
         body {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        
         position: relative;
         height: 100vh;
         margin: 0;
@@ -32,7 +34,7 @@
         position: absolute;
         top: 0px; /* Adjust vertical position as needed */
         left: 0; /* Adjust horizontal position as needed */
-        width: 70px; /* Adjust width of the image */
+        width: 80px; /* Adjust width of the image */
         height: auto; /* Maintain aspect ratio */
         z-index: 1; /* Ensure image is above the red strip */
     }
@@ -40,7 +42,7 @@
         position: absolute;
         top: 0px; /* Adjust vertical position as needed */
         right: 0; /* Adjust horizontal position as needed */
-        width: 70px; /* Adjust width of the image */
+        width: 80px; /* Adjust width of the image */
         height: auto; /* Maintain aspect ratio */
         z-index: 1; /* Ensure image is above the red strip */
     }
@@ -54,14 +56,14 @@
         position: fixed;
         top: 0;
         bottom: 0;
-        width: 70px;
+        width: 80px;
         height: 100vh;
         background-color: red;
+        z-index: -1; /* Ensure these elements are behind other content */
     }
 
     body::before {
-        left: 0; 
-        
+        left: 0;    
 
     }
 

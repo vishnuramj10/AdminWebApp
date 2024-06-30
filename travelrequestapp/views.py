@@ -22,18 +22,28 @@ def home(request):
         form.submitted_by = user_profile.id
         PersonFormSet = modelformset_factory(Person, form=PersonForm, exclude=['travel_auth_form'])
         formset = PersonFormSet(request.POST) 
+        form.supervisor = None
         if form.is_valid():
+            print('hi')
             travel_pre_auth = form.save(commit=False)
             travel_pre_auth.submitted_by = user_profile  # Set the submitted_by field to the current user profile
             travel_pre_auth.final_approval_status = 'Pending'  # Set the initial final approval status
             travel_pre_auth.save()
-            supervisor_email = Supervisor.objects.get(id=form.cleaned_data.get('supervisor')).email
-            send_email('Automated email :: Sent for Approval', 'Your request has been sent to your supervisor for Approval.', 
-                      ['vb440@scarletmail.rutgers.edu'])
-            #send_mail('Automated email :: Approval Sent', 'Your request has been sent to your supervisor for Approval.', 
+            if travel_pre_auth.supervisor:
+                supervisor_email = Supervisor.objects.get(id=form.cleaned_data.get('supervisor')).email
+                send_email('Automated email :: Sent for Approval', 'Your request has been sent to your supervisor for Approval.', 
+                            ['vb440@scarletmail.rutgers.edu'])
+                #send_mail('Automated email :: Approval Sent', 'Your request has been sent to your supervisor for Approval.', 
              #         settings.EMAIL_HOST_USER, [f'{user_profile.email}'])
-            #send_email('Automated email :: New Approval Request', 'You have received a new Travel Request', 
-             #         [f'{supervisor_email}'])
+                #send_email('Automated email :: New Approval Request', 'You have received a new Travel Request', 
+                #         [f'{supervisor_email}'])
+            else:
+                send_email('Automated email :: Sent for Approval', 'Your request has been sent to your supervisor for Approval.', 
+                            ['vb440@scarletmail.rutgers.edu'])
+                #send_mail('Automated email :: Approval Sent', 'Your request has been sent to your supervisor for Approval.', 
+                #         settings.EMAIL_HOST_USER, [f'{user_profile.email}'])
+                #send_email('Automated email :: New Approval Request', 'You have received a new Travel Request', 
+                #         [''kimaada@rutgers.edu'])
             if form.cleaned_data.get('people_travelling') > 0:
                 if formset.is_valid():
                     print(formset)
@@ -80,14 +90,18 @@ def home(request):
         #     submitted_user_profile = Supervisor.objects.get(email=submitted_user_profile.email)
         #     person_form.submitted_by_name = submitted_user_profile.name
         #     person_form.related_persons = Person.objects.filter(travel_auth_form_id=person_form.id)
-        approved_forms = TravelAuthForm.objects.filter(Q(final_approval_status='Approved') | (Q(first_approval=True) & Q(final_approval_status='Pending')))        # for person_form in approved_forms:
-        #     submitted_user_profile = User.objects.filter(id = person_form.submitted_by)
+        approved_forms = TravelAuthForm.objects.filter(
+            (Q(final_approval_status='Approved') | (Q(first_approval=True) & Q(final_approval_status='Pending'))) &
+            Q(supervisor=supervisor_profile.id)
+        )        #     submitted_user_profile = User.objects.filter(id = person_form.submitted_by)
         #     submitted_user_profile = Supervisor.objects.get(email=submitted_user_profile.email)
         #     person_form.submitted_by_name = submitted_user_profile.name
         #     person_form.related_persons = Person.objects.filter(travel_auth_form_id=person_form.id)
 
-        rejected_forms = TravelAuthForm.objects.filter(final_approval_status='Rejected')
-        # for person_form in rejected_forms:
+        rejected_forms = TravelAuthForm.objects.filter(
+            final_approval_status='Rejected',
+            supervisor=supervisor_profile.id
+        )        # for person_form in rejected_forms:
         #     submitted_user_profile = User.objects.filter(id = person_form.submitted_by)
         #     submitted_user_profile = Supervisor.objects.get(email=submitted_user_profile.email)
         #     person_form.submitted_by_name = submitted_user_profile.name
