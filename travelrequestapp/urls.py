@@ -8,4 +8,5 @@ urlpatterns = [
     path("signup/", authView, name="authView"),
     path("accounts/",include("django.contrib.auth.urls")),
     path('approval_request/', approvals, name='approval_request'),
+
 ] + static(settings.STATIC_URL)

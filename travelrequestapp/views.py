@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import *  # Assuming you have a UserProfile model
 from .forms import *
 from travelrequestapp.models import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import logout
 from .utils import *
@@ -58,9 +58,10 @@ def home(request):
                         prefix += 1
                 else:
                     print(formset.errors)
-            return redirect('travelrequestapp:home')
+            return JsonResponse({'success': True}, status=200)
+            #return redirect('travelrequestapp:home')
         else:
-            print(form.errors)
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
         form = TravelPreAuthorizationModelForm()
         PersonFormSet = modelformset_factory(Person, form=PersonForm, exclude=['travel_auth_form'])
@@ -74,7 +75,6 @@ def home(request):
         for form in forms:
             submitted_user_profile = Supervisor.objects.get(email=form.submitted_by.email)
             form.submitted_by_name = submitted_user_profile.name
-            print(form.submitted_by_name)
             form.related_persons = Person.objects.filter(travel_auth_form_id=form.id)
 
     if is_supervisor:

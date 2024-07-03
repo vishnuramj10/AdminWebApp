@@ -123,7 +123,7 @@
                     <br>
                     <p>2/ Form should be Submitted 4 weeks Prior to Planned Travel.</p>
                     <br>
-                    <form method="POST">
+                    <form id="travel-form" method="POST">
                         {% csrf_token %}
                         {% if form.errors %}
                         <div class="errorlist">
@@ -313,7 +313,7 @@
                                                     <td>{{ form.reason_for_travel }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><strong>People Travelling:</strong></td>
+                                                    <td><strong>Additional People Travelling:</strong></td>
                                                     <td>{{ form.people_travelling }}</td>
                                                 </tr>
                                                 <tr>
@@ -545,34 +545,53 @@
             </div>
         </div>
     </div>
- </div>
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="successModalLabel">Form Submission Successful!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>Your form has been submitted successfully.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
         
         const addMorePeople = document.getElementById('people-travelling');
-const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
-const formCopyTarget = document.getElementById('person-form-list');
-addMorePeople.addEventListener('input', add_new_form);
-formCopyTarget.innerHTML = '';
+        const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
+        const formCopyTarget = document.getElementById('person-form-list');
+        addMorePeople.addEventListener('input', add_new_form);
+        formCopyTarget.innerHTML = '';
 
-function add_new_form(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    const currentValue = parseInt(event.target.value);
-    const currentFormsCount = formCopyTarget.getElementsByClassName('person-form').length;
-    
-    if (currentValue > parseInt(event.target.min)) {
-        if (currentValue > currentFormsCount) {
-            addForm(currentValue, currentFormsCount);
-        } else if (currentValue < currentFormsCount) {
-            removeForm(currentValue, currentFormsCount);
-        }
-    } else {
-        removeForm(0, currentFormsCount);
-    }
+        function add_new_form(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            const currentValue = parseInt(event.target.value);
+            const currentFormsCount = formCopyTarget.getElementsByClassName('person-form').length;
+            
+            if (currentValue > parseInt(event.target.min)) {
+                if (currentValue > currentFormsCount) {
+                    addForm(currentValue, currentFormsCount);
+                } else if (currentValue < currentFormsCount) {
+                    removeForm(currentValue, currentFormsCount);
+                }
+            } else {
+                removeForm(0, currentFormsCount);
+            }
 
     function addForm(newCount, currentCount) {
         const emptyFormEl = document.getElementById('empty-form').cloneNode(true);
@@ -662,6 +681,32 @@ function add_new_form(event) {
             document.getElementById(`form${formId}`).target = `iframe${formId}`; // Set form target to iframe
             document.getElementById(`form${formId}`).submit();
         }
+
+        $(document).ready(function() {
+                $('#travel-form').on('submit', function(event) {
+                    event.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'),
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if (response.success) {
+                                $('#successModal').modal('show');
+                                $('#successModal').on('hidden.bs.modal', function (e) {
+                                    window.location.reload(); // Reload the page after modal is closed
+                                    //document.getElementById("#travel-form").reset();
+                                });
+                            } else {
+                                alert('Error: ' + JSON.stringify(response.responseJSON.errors.__all__));
+                            }
+                        },
+                        error: function(response) {
+                            alert('Error: ' + JSON.stringify(response.responseJSON.errors.__all__));
+                        }
+                    });
+                });
+            });
+    </script>
         
 
     </script>
